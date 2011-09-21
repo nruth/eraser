@@ -17,7 +17,8 @@ describe FileSplit do
     describe "on an mp3" do
       let(:expected_filenames) { %w(test.mp3.o0 test.mp3.o1 test.mp3.o2) }
       before(:each) do
-        @filepath = File.join(File.dirname(__FILE__), *%w[.. media test.mp3])
+        @filepath = File.expand_path(File.join(File.dirname(__FILE__), *%w[.. media test.mp3]))
+        raise "Please copy an mp3 or other binary file to #{@filepath}" unless File.exists?(@filepath)
         @return_value = FileSplit.split_file_into_n_pieces(@filepath, 3)
       end
 
