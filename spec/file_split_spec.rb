@@ -30,9 +30,7 @@ describe FileSplit do
       specify "rejoining the output files gives the same content as the original file" do
         require 'digest/sha1'
         bits = ""
-        expected_filenames.each do |filename|
-          bits << File.read(filename)
-        end
+        expected_filenames.each {|f| bits << File.read(f)}
         Digest::SHA1.hexdigest(bits).should == Digest::SHA1.hexdigest(File.read(@filepath))
       end
     end
