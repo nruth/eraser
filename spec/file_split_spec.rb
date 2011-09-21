@@ -16,10 +16,11 @@ describe FileSplit do
 
     describe "on an mp3" do
       let(:expected_filenames) { %w(test.mp3.o1 test.mp3.o2 test.mp3.o3) }
+      let(:num_pieces) {3}
       before(:each) do
         @filepath = File.expand_path(File.join(File.dirname(__FILE__), *%w[.. media test.mp3]))
         raise "Please copy an mp3 or other binary file to #{@filepath}" unless File.exists?(@filepath)
-        @return_value = FileSplit.new(@filepath).split_file_into_n_pieces(3)
+        @return_value = FileSplit.new(@filepath).split_file_into_n_pieces(num_pieces)
       end
 
       it "splits a given file into n pieces, putting resulting files in the pwd" do
@@ -28,13 +29,25 @@ describe FileSplit do
         end
       end
 
-      it "produces files of equal byte-length"
+      it "produces files of equal byte-length" do
+        filesizes = expected_filenames.map {|f| File.stat(f).size}
+        filesizes.each {|size| size.should == filesizes.first}
+      end
 
-      specify "rejoining the output files gives the same content as the original file" do
+      specify "rejoining the output files gives the same content as the original file when zero padded" do
         require 'digest/sha1'
         bits = ""
         expected_filenames.each {|f| bits << File.read(f)}
-        Digest::SHA1.hexdigest(bits).should == Digest::SHA1.hexdigest(File.read(@filepath))
+        original_file_contents = File.read(@filepath)
+        original_file_contents << (1..Padding.read_padding_bytes('test.mp3')).map {0}.pack('c*')
+        Digest::SHA1.hexdigest(bits).should == Digest::SHA1.hexdigest(original_file_contents)
+      end
+
+      specify "reassembling the output files gives the same content as the original file" do
+        require 'digest/sha1'
+        require File.join(File.dirname(__FILE__), *%w[.. lib piece_assembler])
+        reassembled = PieceAssembler.new(File.basename(@filepath)).build_from_pieces(num_pieces)
+        Digest::SHA1.hexdigest(reassembled).should == Digest::SHA1.hexdigest(File.read(@filepath))
       end
     end
   end
