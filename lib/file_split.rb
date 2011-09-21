@@ -19,16 +19,12 @@ class FileSplit
     end
 
     if eof_padding_bytes > 0
-      zero_pad_eof(piece_filenames.last, eof_padding_bytes)
+      Padding.zero_pad_eof(piece_filenames.last, eof_padding_bytes)
       Padding.write_padding_metafile(input_filename, eof_padding_bytes) 
     end
   end
 
   private
-  def zero_pad_eof(filename, eof_padding_bytes)
-    File.open(filename, 'a') {|f| f.print(((1..eof_padding_bytes).map {0}).pack('c*'))}
-  end
-
   def create_piece(filename, input_stream, piece_size)
     File.open filename, 'w' do |piece_file|
       piece_file.print input_stream.read(piece_size)
