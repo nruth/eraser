@@ -15,7 +15,7 @@ describe FileSplit do
     end
 
     describe "on an mp3" do
-      let(:expected_filenames) { %w(test.mp3.o0 test.mp3.o1 test.mp3.o2) }
+      let(:expected_filenames) { %w(test.mp3.o1 test.mp3.o2 test.mp3.o3) }
       before(:each) do
         @filepath = File.expand_path(File.join(File.dirname(__FILE__), *%w[.. media test.mp3]))
         raise "Please copy an mp3 or other binary file to #{@filepath}" unless File.exists?(@filepath)
@@ -27,6 +27,8 @@ describe FileSplit do
           File.should exist(filename), "expected file #{filename} to exist"
         end
       end
+
+      it "produces files of equal byte-length"
 
       specify "rejoining the output files gives the same content as the original file" do
         require 'digest/sha1'
