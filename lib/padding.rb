@@ -17,4 +17,12 @@ module Padding
     leftover_bytes = bytes_in_file % num_pieces
     padding_bytes = num_pieces - leftover_bytes
   end
+
+  def self.zero_pad_eof(filepath, bytes)
+    File.open(filepath, 'a') do |f|
+      padding = []
+      bytes.times {padding << 0 }
+      f.print padding.pack('c*')
+    end
+  end
 end
