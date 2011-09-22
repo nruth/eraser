@@ -1,7 +1,7 @@
 require File.join(File.dirname(__FILE__), *%w[.. lib piece_assembler])
 
 describe PieceAssembler do
-  describe "decode_pieces(wanted_pieces)" do
+  describe "decode_pieces(pieces, wanted_pieces)" do
     around(:each) do |example|
       require 'fileutils'
       begin
@@ -15,12 +15,24 @@ describe PieceAssembler do
     end
 
     it "returns a combination for the requested piece code" do
-      pending
-      PieceAssembler.decode_pieces([0b1000, 0b0110, 0b0011, 0b0100], [0b1000]).should == [0b1000]
-      PieceAssembler.decode_pieces([0b0100]).should == [0b0100]
-      PieceAssembler.decode_pieces([0b0010]).should == [0b0101]
-      PieceAssembler.decode_pieces([0b0001]).should == [0b0111]
+      pieces = [0b1000, 0b0110, 0b0011, 0b0100]
+      PieceAssembler.decode_pieces(pieces, [0b0100]).should == [0b0001]
+      PieceAssembler.decode_pieces(pieces, [0b0010]).should == [0b0101]
+      PieceAssembler.decode_pieces(pieces, [0b0001]).should == [0b0111]
+      PieceAssembler.decode_pieces(pieces, [0b1000]).should == [0b1000]
     end
+  end
+
+  describe "all_possible_combinations for 4 items" do
+    subject {PieceAssembler.all_possible_combinations}
+    its(:length) {should eq(15) }
+    it "should contain all 4 bit binary combinations" do
+      subject.should == [ 0b0001, 0b0010, 0b0011, 0b0100, 
+                          0b0101, 0b0110, 0b0111, 0b1000, 
+                          0b1001, 0b1010, 0b1011, 0b1100, 
+                          0b1101, 0b1110, 0b1111]
+    end
+    
   end
 
   describe "combination_xors_to_wanted_piece?(pieces, combination_of_pieces, wanted_piece)" do

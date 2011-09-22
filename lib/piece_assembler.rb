@@ -18,25 +18,23 @@ class PieceAssembler
     binary
   end
 
+  #pieces - available pieces' bitsequences, e.g. [0b1000, 0b0110, 0b0011, 0b0100]
+  #wanted_pieces - pieces to find, e.g. [0b1000, 0b0100, 0b0010, 0b0001]
   def self.decode_pieces(pieces, wanted_pieces)
     solutions = []
-    self.all_possible_combinations.each do |combination_of_pieces|
-      puts "trying #{combination_of_pieces}"
+    self.all_possible_combinations.each do |combination|
       wanted_pieces.each do |wanted_piece|
-        puts "looking for #{wanted_piece}"
-        if combination_xors_to_wanted_piece?(pieces, combination_of_pieces, wanted_piece)
-          solutions << combination_of_pieces
+        if combination_xors_to_wanted_piece?(pieces, combination, wanted_piece)
+          solutions << combination
           break
         end
       end
     end
+    solutions
   end
 
   def self.all_possible_combinations
-    require 'set'
-    perms = (1..4).map{|n| [1, 2, 3, 4].permutation(n).to_a}.flatten(1)
-    perm_set = Set.new | (perms.map {|p| Set.new | p  })
-    perm_set
+    (1..15).to_a
   end
 
   # pieces = [0b1000, 0b0110, 0b0011, 0b0100] etc metadata
