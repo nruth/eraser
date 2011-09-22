@@ -1,5 +1,5 @@
-require 'pieces'
-require 'padding'
+require File.join(File.dirname(__FILE__), 'pieces')
+require File.join(File.dirname(__FILE__), 'padding')
 
 class FileSplit
   attr_reader :input_filepath
