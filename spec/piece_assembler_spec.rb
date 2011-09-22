@@ -1,25 +1,14 @@
 require File.join(File.dirname(__FILE__), *%w[.. lib piece_assembler])
 
 describe PieceAssembler do
-  describe "decode_pieces(pieces, wanted_pieces)" do
-    around(:each) do |example|
-      require 'fileutils'
-      begin
-        FileUtils.mkdir 'tmp'
-        FileUtils.cd 'tmp' do
-          example.run
-        end
-      ensure
-        FileUtils.rm_rf 'tmp'
-      end
-    end
-
+  describe "decode_pieces(wanted_pieces)" do
+    let(:pieces) {[0b1000, 0b0110, 0b0011, 0b0100]}
+    subject {PieceAssembler.new(pieces)}
     it "returns a combination for the requested piece code" do
-      pieces = [0b1000, 0b0110, 0b0011, 0b0100]
-      PieceAssembler.decode_pieces(pieces, [0b0100]).should == [0b0001]
-      PieceAssembler.decode_pieces(pieces, [0b0010]).should == [0b0101]
-      PieceAssembler.decode_pieces(pieces, [0b0001]).should == [0b0111]
-      PieceAssembler.decode_pieces(pieces, [0b1000]).should == [0b1000]
+      subject.decode_pieces([0b0100]).should == [0b0001]
+      subject.decode_pieces([0b0010]).should == [0b0101]
+      subject.decode_pieces([0b0001]).should == [0b0111]
+      subject.decode_pieces([0b1000]).should == [0b1000]
     end
   end
 
@@ -32,24 +21,24 @@ describe PieceAssembler do
                           0b1001, 0b1010, 0b1011, 0b1100, 
                           0b1101, 0b1110, 0b1111]
     end
-    
   end
 
-  describe "combination_xors_to_wanted_piece?(pieces, combination_of_pieces, wanted_piece)" do
+  describe "combination_xors_to_wanted_piece?(combination_of_pieces, wanted_piece)" do
     let(:pieces) {[0b1000, 0b0110, 0b0011, 0b0100]}
+    subject {PieceAssembler.new(pieces)}
 
     specify "given a workable solution it returns true" do
       combination, wanted_piece = 0b1000, 0b1000
-      PieceAssembler.combination_xors_to_wanted_piece?(pieces, combination, wanted_piece).should be_true, "#{format("%#b", combination)} xor combination of #{pieces.map{|p| format("%#b", p)}.join(',')} should match #{format('%#b', wanted_piece)}"
+      subject.combination_xors_to_wanted_piece?(combination, wanted_piece).should be_true, "#{format("%#b", combination)} xor combination of #{pieces.map{|p| format("%#b", p)}.join(',')} should match #{format('%#b', wanted_piece)}"
 
       combination, wanted_piece = 0b0101, 0b0010
-      PieceAssembler.combination_xors_to_wanted_piece?(pieces, combination, wanted_piece).should be_true, "#{format("%#b", combination)} xor combination of #{pieces.map{|p| format("%#b", p)}.join(',')} should match #{format('%#b', wanted_piece)}"
+      subject.combination_xors_to_wanted_piece?(combination, wanted_piece).should be_true, "#{format("%#b", combination)} xor combination of #{pieces.map{|p| format("%#b", p)}.join(',')} should match #{format('%#b', wanted_piece)}"
     end
 
     specify "given a false solution it returns false" do
       wanted_piece = 0b1000
       combinations = [0b0000, 0b0110].each do |combination|
-        PieceAssembler.combination_xors_to_wanted_piece?(pieces, combination, wanted_piece).should be_false, "#{format("%#b", combination)} xor combination of #{pieces.map{|p| format("%#b", p)}.join(',')} should not match #{format('%#b', wanted_piece)}"
+        subject.combination_xors_to_wanted_piece?(combination, wanted_piece).should be_false, "#{format("%#b", combination)} xor combination of #{pieces.map{|p| format("%#b", p)}.join(',')} should not match #{format('%#b', wanted_piece)}"
       end
     end
   end
