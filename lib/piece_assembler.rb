@@ -42,8 +42,7 @@ class PieceAssembler
   # wanted_piece = 0b0001 or whatever for o1 o2 etc  
   def self.combination_xors_to_wanted_piece?(pieces, combination_of_pieces, wanted_piece)
     pieces_to_xor = elements_indexed_by_bitmask(pieces, combination_of_pieces)
-    result = pieces_to_xor.reduce(:'^')
-    result == wanted_piece
+    pieces_to_xor.reduce(:'^') == wanted_piece
   end
 
   def self.elements_indexed_by_bitmask(array, bitmask)
