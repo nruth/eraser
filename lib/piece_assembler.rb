@@ -1,5 +1,5 @@
-require 'pieces'
-require 'padding'
+require File.join(File.dirname(__FILE__), 'pieces')
+require File.join(File.dirname(__FILE__), 'padding')
 
 class PieceAssembler
   attr_reader :filename
