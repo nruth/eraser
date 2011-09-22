@@ -46,7 +46,7 @@ describe FileSplit do
       specify "reassembling the output files gives the same content as the original file" do
         require 'digest/sha1'
         require File.join(File.dirname(__FILE__), *%w[.. lib piece_assembler])
-        reassembled = PieceAssembler.new(File.basename(@filepath)).build_from_pieces(num_pieces)
+        reassembled = PieceAssembler.build_from_pieces(File.basename(@filepath), num_pieces)
         Digest::SHA1.hexdigest(reassembled).should == Digest::SHA1.hexdigest(File.read(@filepath))
       end
     end
