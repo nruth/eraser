@@ -20,5 +20,13 @@ module Eraser
     def method_missing(method, *args, &block)
       file.send method, *args, &block
     end
+
+    def self.bitmask_appended_filename(filename, bitmask)
+      format '%s.%04b', filename, bitmask
+    end
+
+    def self.appended_filename(filename, postfix)
+      format '%s.%s', filename, postfix
+    end
   end
 end
