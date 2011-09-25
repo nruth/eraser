@@ -1,6 +1,6 @@
-require File.join(File.dirname(__FILE__), *%w[.. lib file_split])
+require File.join(File.dirname(__FILE__), *%w[.. lib chopper])
 
-describe FileSplit do
+describe Chopper do
   describe "split_file_into_n_pieces(file, n_pieces)" do
     around(:each) do |example|
       require 'fileutils'
@@ -20,7 +20,7 @@ describe FileSplit do
       before(:each) do
         @filepath = File.expand_path(File.join(File.dirname(__FILE__), *%w[.. media test.mp3]))
         raise "Please copy an mp3 or other binary file to #{@filepath}" unless File.exists?(@filepath)
-        @return_value = FileSplit.new(@filepath).split_file_into_n_pieces(num_pieces)
+        @return_value = Chopper.new(@filepath).split_file_into_n_pieces(num_pieces)
       end
 
       it "splits a given file into n pieces, putting resulting files in the pwd" do
