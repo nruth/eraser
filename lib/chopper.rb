@@ -1,7 +1,7 @@
 require File.join(File.dirname(__FILE__), 'pieces')
 require File.join(File.dirname(__FILE__), 'padding')
 
-class FileSplit
+class Chopper
   attr_reader :input_filepath
   def initialize(input_filepath)
     @input_filepath = input_filepath
