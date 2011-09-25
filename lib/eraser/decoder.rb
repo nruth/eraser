@@ -1,8 +1,5 @@
-# require File.join(File.dirname(__FILE__), 'pieces')
-# require File.join(File.dirname(__FILE__), 'padding')
-
 module Eraser
-  class PieceAssembler
+  class Decoder
     attr_reader :pieces
 
     #pieces - available pieces' bitsequences, e.g. [0b1000, 0b0110, 0b0011, 0b0100]
@@ -30,18 +27,6 @@ module Eraser
       pieces_to_xor = self.class.elements_indexed_by_bitmask(pieces, combination_of_pieces)
       pieces_to_xor.reduce(:'^') == wanted_piece
     end
-
-    #final assembly from base pieces, doesn't encode/decode anything
-    def self.build_from_pieces(filename, num_pieces)
-      binary = ""
-      piece_names = Pieces.piece_names(filename, num_pieces)
-      piece_names[0..-2].each {|piece| binary << File.read(piece) }
-
-      last_piece = piece_names.last
-      binary << File.read(last_piece, File.stat(last_piece).size - Padding.read_padding_bytes(filename))
-      binary
-    end
-
     def self.all_possible_combinations
       (1..15).to_a
     end
@@ -55,6 +40,17 @@ module Eraser
         end
       end
       result
+    end
+
+    #final assembly from base pieces, doesn't encode/decode anything
+    def self.build_from_pieces(filename, num_pieces)
+      binary = ""
+      piece_names = Code.fundamental_bitmasks(num_pieces).map{|n| File.bitmask_appended_filename(filename, n)}
+      piece_names[0..-2].each {|piece| binary << ::File.read(piece) }
+
+      last_piece = piece_names.last
+      binary << ::File.read(last_piece, ::File.stat(last_piece).size - Eraser::Padding.read_padding_bytes(filename))
+      binary
     end
   end
 end

@@ -10,7 +10,8 @@ module Eraser
 
     #record the padding so it can be ignored on read/reconstruction
     def self.write_padding_metafile(filename, padding_bytes)
-      ::File.open("#{filename}.end_padding", 'w') {|f| f.print padding_bytes } 
+      padding_file = File.appended_filename(filename, 'end_padding')
+      ::File.open(padding_file, 'w') {|f| f.print padding_bytes } 
     end
 
     def self.zero_pad_eof(file, bytes)

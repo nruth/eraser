@@ -20,15 +20,25 @@ describe Eraser::Chopper do
     describe "split_file_into_n_pieces(4)" do
       it "splits a 16 byte file into 4x4B pieces masked 0001 0010 0100 1000" do
         input_file.should_receive(:read).with(4).exactly(4).times.and_return data = mock
-        (0b0001..0b0100).each do |bitmask|
+        [0b0001, 0b0010, 0b0100, 0b1000].each do |bitmask|
           Eraser::Piece.should_receive(:new).with(filename, bitmask).and_return piece = mock
           piece.should_receive(:overwrite).with(data).and_return piece
         end
         subject.split_file_into_n_pieces(4)
-      end  
+      end
+      
+      it "returns the piece instances" do
+        pieces = []
+        input_file.stub(:read).and_return mock
+        [0b0001, 0b0010, 0b0100, 0b1000].each do |bitmask|
+          Eraser::Piece.stub(:new).and_return piece = mock.as_null_object
+          pieces =+ piece
+        end
+        subject.split_file_into_n_pieces(4)
+      end
     end
   end
-
+  
   describe "initialised with an 18 byte file" do
     let(:filename) {'vicky.jpg'}
     let(:input_file) {mock(:bytes_in_file => 18, :name => filename)}
@@ -37,7 +47,7 @@ describe Eraser::Chopper do
       it "splits into 4x5B pieces masked 0001 0010 0100 1000, pads the last file with 2 bytes of zeros, and records the padding" do
         input_file.should_receive(:read).with(5).exactly(4).times.and_return data = mock
         last_piece = nil
-        (0b0001..0b0100).each do |bitmask|
+        [0b0001, 0b0010, 0b0100, 0b1000].each do |bitmask|
           Eraser::Piece.should_receive(:new).with(filename, bitmask).and_return piece = mock
           piece.should_receive(:overwrite).with(data).and_return piece
           last_piece = piece
@@ -55,7 +65,7 @@ describe Eraser::Chopper do
     let(:expected_filenames) { %w(test.mp3.0001 test.mp3.0010 test.mp3.0100 test.mp3.1000) }
     let(:num_pieces) {4}
     before(:each) do
-      pending "need the implementation"
+      # pending "need the implementation"
       @file = Eraser::File.new sample_file_path
       raise "Please copy an mp3 or other binary file to #{sample_file_path}" unless File.exists?(sample_file_path)
       @return_value = Eraser::Chopper.new(@file).split_file_into_n_pieces(num_pieces)
@@ -77,14 +87,13 @@ describe Eraser::Chopper do
       bits = ""
       expected_filenames.each {|f| bits << File.read(f)}
       original_file_contents = File.read(sample_file_path)
-      original_file_contents << (1..Padding.read_padding_bytes('test.mp3')).map {0}.pack('c*')
+      original_file_contents << (1..Eraser::Padding.read_padding_bytes('test.mp3')).map {0}.pack('c*')
       Digest::SHA1.hexdigest(bits).should == Digest::SHA1.hexdigest(original_file_contents)
     end
 
     specify "reassembling the output files gives the same content as the original file" do
       require 'digest/sha1'
-      require File.join(File.dirname(__FILE__), *%w[.. lib piece_assembler])
-      reassembled = PieceAssembler.build_from_pieces(File.basename(@filepath), num_pieces)
+      reassembled = Eraser::Decoder.build_from_pieces(@file.name, num_pieces)
       Digest::SHA1.hexdigest(reassembled).should == Digest::SHA1.hexdigest(File.read(sample_file_path))
     end
   end
