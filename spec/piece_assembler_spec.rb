@@ -1,9 +1,9 @@
-require File.join(File.dirname(__FILE__), *%w[.. lib piece_assembler])
+require File.join(File.dirname(__FILE__), *%w[.. lib eraser piece_assembler])
 
-describe PieceAssembler do
+describe Eraser::PieceAssembler do
   describe "decode_pieces(wanted_pieces)" do
     let(:pieces) {[0b1000, 0b0110, 0b0011, 0b0100]}
-    subject {PieceAssembler.new(pieces)}
+    subject {Eraser::PieceAssembler.new(pieces)}
     it "returns a combination for the requested piece code" do
       subject.decode_pieces([0b0100]).should == [0b0001]
       subject.decode_pieces([0b0010]).should == [0b0101]
@@ -13,7 +13,7 @@ describe PieceAssembler do
   end
 
   describe "all_possible_combinations for 4 items" do
-    subject {PieceAssembler.all_possible_combinations}
+    subject {Eraser::PieceAssembler.all_possible_combinations}
     its(:length) {should eq(15) }
     it "should contain all 4 bit binary combinations" do
       subject.should == [ 0b0001, 0b0010, 0b0011, 0b0100, 
@@ -25,7 +25,7 @@ describe PieceAssembler do
 
   describe "combination_xors_to_wanted_piece?(combination_of_pieces, wanted_piece)" do
     let(:pieces) {[0b1000, 0b0110, 0b0011, 0b0100]}
-    subject {PieceAssembler.new(pieces)}
+    subject {Eraser::PieceAssembler.new(pieces)}
 
     specify "given a workable solution it returns true" do
       combination, wanted_piece = 0b1000, 0b1000
@@ -46,20 +46,20 @@ describe PieceAssembler do
   describe "elements_indexed_by_bitmask(array, bitmask)" do
     let(:array) {[:a, :b, :c, :d]}
     it "pulls out single elements" do
-      PieceAssembler.elements_indexed_by_bitmask(array, 0b1000).should == [:a]
-      PieceAssembler.elements_indexed_by_bitmask(array, 0b0100).should == [:b]
-      PieceAssembler.elements_indexed_by_bitmask(array, 0b0010).should == [:c]
-      PieceAssembler.elements_indexed_by_bitmask(array, 0b0001).should == [:d]
+      Eraser::PieceAssembler.elements_indexed_by_bitmask(array, 0b1000).should == [:a]
+      Eraser::PieceAssembler.elements_indexed_by_bitmask(array, 0b0100).should == [:b]
+      Eraser::PieceAssembler.elements_indexed_by_bitmask(array, 0b0010).should == [:c]
+      Eraser::PieceAssembler.elements_indexed_by_bitmask(array, 0b0001).should == [:d]
     end
 
     it "pulls out all elements with 1111" do
-      PieceAssembler.elements_indexed_by_bitmask(array, 0b1111).should == [:a, :b, :c, :d]
+      Eraser::PieceAssembler.elements_indexed_by_bitmask(array, 0b1111).should == [:a, :b, :c, :d]
     end
 
     it "pulls out 2 elements with 1100 0110 etc" do
-      PieceAssembler.elements_indexed_by_bitmask(array, 0b1001).should == [:a, :d]
-      PieceAssembler.elements_indexed_by_bitmask(array, 0b1010).should == [:a, :c]
-      PieceAssembler.elements_indexed_by_bitmask(array, 0b0110).should == [:b, :c]
+      Eraser::PieceAssembler.elements_indexed_by_bitmask(array, 0b1001).should == [:a, :d]
+      Eraser::PieceAssembler.elements_indexed_by_bitmask(array, 0b1010).should == [:a, :c]
+      Eraser::PieceAssembler.elements_indexed_by_bitmask(array, 0b0110).should == [:b, :c]
     end
   end
 end
