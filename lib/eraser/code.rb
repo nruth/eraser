@@ -25,12 +25,8 @@ module Eraser
     def self.elements_indexed_by_bitmask(array, bitmask)
       raise "only supports length 4 arrays" unless array.length == 4 
       result = []
-      fundamental_bitmasks(4).reverse.each_with_index do |pieces_index_mask, i|
-        # puts bitmask.inspect
-        # puts pieces_index_mask.inspect
-        if (bitmask & pieces_index_mask) != 0
-          result << array[i]
-        end
+      fundamental_bitmasks(4).each_with_index do |pieces_index_mask, i|
+        result << array[i] if (bitmask & pieces_index_mask) != 0
       end
       result
     end

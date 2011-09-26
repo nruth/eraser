@@ -11,7 +11,6 @@ module Eraser
     end
 
     def copy_pieces(pieces)
-      puts "copying #{pieces.join(',')}"
       pieces.each{|p| copy_piece(p)}
     end
 

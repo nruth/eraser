@@ -9,9 +9,7 @@ module Eraser
     end
 
     def decode(wanted_pieces)
-      puts "wanted #{wanted_pieces.inspect}"
       solutions = self.solutions(wanted_pieces)
-      puts "solutions #{solutions.inspect}"
       solutions.map do |solution|
         pieces_selected_by_solution = Code.elements_indexed_by_bitmask(pieces, solution)
         Piece.content_xor_to_new_file(pieces_selected_by_solution)
