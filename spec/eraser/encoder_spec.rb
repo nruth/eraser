@@ -68,7 +68,7 @@ describe Eraser::Encoder do
         file.stub!(:read).and_return 0b1111000011110000
         file.stub!(:name).and_return name = 'hepp'
         subject.encode
-        expected_filenames = Eraser::Code.new.basis_vectors.map {|v| Eraser::File.bitmask_appended_filename(name, v)}
+        expected_filenames = Eraser::Code.basis_vectors.map {|v| Eraser::File.bitmask_appended_filename(name, v)}
         expected_filenames.each do |filename|
           File.should exist(filename), "expected file #{filename} to exist"
         end

@@ -1,8 +1,7 @@
 module Eraser
-  class Code
-    attr_accessor :code
-    def initialize
-      self.code = {
+  module Code
+    def self.code
+      {
         1 =>  [0b1000, 0b0110],
         2 =>  [0b0100, 0b0011],
         3 =>  [0b0010, 0b1101],
@@ -11,11 +10,11 @@ module Eraser
       }
     end
 
-    def basis_vectors
+    def self.basis_vectors
       code.values.flatten
     end
 
-    def basis_vectors_for_node(node_id)
+    def self.basis_vectors_for_node(node_id)
       code[node_id]
     end
 
