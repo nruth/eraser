@@ -5,6 +5,8 @@ module Eraser
     #pieces - available pieces (Eraser::Piece)
     # - must be of length 4 currently for decoding to succeed
     def initialize(pieces)
+      # pieces.uniq!
+      raise "fail, too many pieces #{pieces.join(', ')}" unless pieces.length == 4
       @pieces = pieces
     end
 
@@ -37,6 +39,8 @@ module Eraser
     # wanted_piece = 0b0001 or whatever for o1 o2 etc  
     def combination_xors_to_wanted_piece?(combination_bitmask, wanted_piece)
       raise "should be given a Piece" unless wanted_piece.is_a?(Eraser::Piece)
+      # puts "combination_bitmask, wanted_piece: #{format('%04b',combination_bitmask)} #{wanted_piece}"
+      # puts "Available pieces: #{pieces.join(', ')}"
       pieces_to_xor = Code.elements_indexed_by_bitmask(pieces, combination_bitmask)
       Piece.bitmask_xor(pieces_to_xor) == wanted_piece.bitmask
     end

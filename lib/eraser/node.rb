@@ -18,7 +18,7 @@ module Eraser
     def copy_piece(piece)
       p = Piece.new(piece.original_filename, piece.bitmask, storage_path)
       p.overwrite(piece.content)
-      @pieces << p
+      add_piece(p)
     end
 
     def storage_path
@@ -41,6 +41,11 @@ module Eraser
     
     def to_s
       "Node #{id}"
+    end
+  
+  private
+    def add_piece(piece)
+      @pieces = @pieces | [piece]
     end
   end
 end

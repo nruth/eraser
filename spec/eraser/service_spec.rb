@@ -128,7 +128,6 @@ describe Eraser::Service do
         service.repair
         File.should exist(stored_piece_path)
         reassembled_hash = Digest::SHA1.hexdigest(File.read(stored_piece_path))
-
         reassembled_hash.should == original_hash
       end
     end

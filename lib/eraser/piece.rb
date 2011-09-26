@@ -63,16 +63,24 @@ module Eraser
     def content
       ::File.open(filename,"rb") {|io| io.read}
     end
-    
+
     def reset_content!
       ::FileUtils.mkpath(@storage_path) if @storage_path && !::File.exist?(@storage_path)
       ::File.open(filename, 'w') do
         #truncate file
       end
     end
-    
+
     def destroy
       ::File.delete(filename) if ::File.exists?(filename)
+    end
+
+    def hash
+      "#{original_filename}#{bitmask}".hash
+    end
+
+    def eql?(other)
+      (self.original_filename == other.original_filename) && (self.bitmask == other.bitmask)
     end
   end
 end

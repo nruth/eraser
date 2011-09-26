@@ -27,12 +27,12 @@ module Eraser
       pieces.each(&:destroy)
     end
 
-    def request_pieces(node, filename)
-      pieces = []
-      node.pieces(filename).each do |sent_piece|
+    # gets pieces from remote node & populates them locally with data
+    def download_pieces(node, filename)
+      node.pieces(filename).map do |sent_piece|
         new_piece = Piece.new(filename, sent_piece.bitmask)
         new_piece.overwrite(sent_piece.content)
-        pieces << new_piece
+        new_piece
       end
     end
 
@@ -50,10 +50,9 @@ module Eraser
 
     def pieces_to_decode_with(filename)
       retrieval_nodes = live_nodes[0..1]
-      puts "using nodes #{retrieval_nodes.join(', ')} for data retrieval"
-      retrieval_nodes.map do |node|
-        request_pieces(node, filename)
-      end.flatten
+      puts "Using nodes #{retrieval_nodes.join(', ')} for data retrieval"
+      pieces = retrieval_nodes.map {|node| download_pieces(node, filename)}
+      pieces.flatten
     end
 
     def decode_to_files(wanted_pieces, pieces_to_decode_with)
@@ -64,14 +63,13 @@ module Eraser
     # finds failed nodes and regenerates them using the other nodes' stored data
     def repair
       @nodes.reject(&:is_alive?).each do |dead_node|
-        puts "repairing #{dead_node}"
         pieces_to_recover = dead_node.pieces.map do |lost_piece|
           Piece.new(lost_piece.original_filename, lost_piece.bitmask)
         end
-        puts "repairing #{pieces_to_recover.join(', ')}"
         #TODO: filename should be looped over for the dead node
         filename = pieces_to_recover.first.original_filename
         new_pieces = decode_to_files(pieces_to_recover, pieces_to_decode_with(filename))
+        puts "Repairing #{dead_node} with pieces: #{new_pieces.join(', ')}"
         dead_node.copy_pieces(new_pieces)
       end
     end
