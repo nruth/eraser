@@ -2,9 +2,17 @@ module Eraser
   class Decoder
     attr_reader :pieces
 
-    #pieces - available pieces' bitsequences, e.g. [0b1000, 0b0110, 0b0011, 0b0100]
+    #pieces - available pieces (Eraser::Piece)
+    # - must be of length 4 currently for decoding to succeed
     def initialize(pieces)
       @pieces = pieces
+    end
+
+    def decode(wanted_pieces)
+      solutions = self.solutions(wanted_pieces)
+      solutions.map do |solution|
+        Piece.content_xor_to_new_file Code.elements_indexed_by_bitmask(pieces, solution)
+      end
     end
 
     #wanted_pieces - pieces to find, e.g. [0b1000, 0b0100, 0b0010, 0b0001]
@@ -25,7 +33,7 @@ module Eraser
     # wanted_piece = 0b0001 or whatever for o1 o2 etc  
     def combination_xors_to_wanted_piece?(combination_of_pieces, wanted_piece)
       pieces_to_xor = Code.elements_indexed_by_bitmask(pieces, combination_of_pieces)
-      pieces_to_xor.reduce(:'^') == wanted_piece
+      Piece.bitmask_xor(pieces) == wanted_piece
     end
 
     #final assembly from base pieces, doesn't encode/decode anything
