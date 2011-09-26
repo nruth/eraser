@@ -9,19 +9,24 @@ module Eraser
     end
 
     def decode(wanted_pieces)
+      puts "wanted #{wanted_pieces.inspect}"
       solutions = self.solutions(wanted_pieces)
+      puts "solutions #{solutions.inspect}"
       solutions.map do |solution|
-        Piece.content_xor_to_new_file Code.elements_indexed_by_bitmask(pieces, solution)
+        pieces_selected_by_solution = Code.elements_indexed_by_bitmask(pieces, solution)
+        Piece.content_xor_to_new_file(pieces_selected_by_solution)
       end
     end
 
     #wanted_pieces - pieces to find, e.g. [0b1000, 0b0100, 0b0010, 0b0001]
+    # returns an array of bitmasks, one element for each wanted_piece,
+    # which indicates which of the available pieces to xor for wanted_piece reconstruction
     def solutions(wanted_pieces)
       solutions = []
-      Decoder.all_possible_combinations.each do |combination|
+      Decoder.all_possible_combinations.each do |combination_bitmask|
         wanted_pieces.delete_if do |wanted_piece|
-          if combination_xors_to_wanted_piece?(combination, wanted_piece)
-            solutions << combination
+          if combination_xors_to_wanted_piece?(combination_bitmask, wanted_piece)
+            solutions << combination_bitmask
             true
           end
         end
@@ -31,9 +36,10 @@ module Eraser
 
     # combination_of_pieces = 0b0110 current test pattern
     # wanted_piece = 0b0001 or whatever for o1 o2 etc  
-    def combination_xors_to_wanted_piece?(combination_of_pieces, wanted_piece)
-      pieces_to_xor = Code.elements_indexed_by_bitmask(pieces, combination_of_pieces)
-      Piece.bitmask_xor(pieces) == wanted_piece
+    def combination_xors_to_wanted_piece?(combination_bitmask, wanted_piece)
+      raise "should be given a Piece" unless wanted_piece.is_a?(Eraser::Piece)
+      pieces_to_xor = Code.elements_indexed_by_bitmask(pieces, combination_bitmask)
+      Piece.bitmask_xor(pieces_to_xor) == wanted_piece.bitmask
     end
 
     #final assembly from base pieces, doesn't encode/decode anything

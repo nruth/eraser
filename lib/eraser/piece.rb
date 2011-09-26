@@ -19,6 +19,7 @@ module Eraser
       bitmask ^ piece.bitmask
     end
 
+    # pieces = [Eraser::Piece] array to xor
     def self.bitmask_xor(pieces)
       pieces.map(&:bitmask).reduce(:'^')
     end

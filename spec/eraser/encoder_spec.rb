@@ -39,6 +39,10 @@ describe Eraser::Encoder do
         chopper.stub(:split_file_into_n_pieces).and_return pieces
       end
 
+      it "returns all the encoded pieces" do
+        subject.encode.length.should == 10
+      end
+
       it "does not process the fundamental basis vectors twice" do
         code.stub(:basis_vectors).and_return [0b0010]
         encoder.should_receive(:encode_pieces_with_bitmask).with(anything(), 0b0010).once

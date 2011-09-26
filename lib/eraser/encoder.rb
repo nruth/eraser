@@ -13,12 +13,14 @@ module Eraser
       fundamental_pieces = Chopper.new(file).split_file_into_n_pieces(n_pieces)
       code = Eraser::Code.new
       codes_to_pack = (code.basis_vectors - Code.fundamental_bitmasks(4)).uniq
-      codes_to_pack.map do |bitmask|
+      packed_pieces = codes_to_pack.map do |bitmask|
         encode_pieces_with_bitmask(fundamental_pieces, bitmask)
       end
+      all_encoded_pieces = fundamental_pieces + packed_pieces
     end
 
     def encode_pieces_with_bitmask(pieces, bitmask)
+      raise "must have 4 pieces" unless pieces.length == 4
       Piece.content_xor_to_new_file Code.elements_indexed_by_bitmask(pieces, bitmask)
     end
   end
