@@ -69,6 +69,14 @@ describe Eraser::Piece do
           subject.content.should == 'new content'
         end
       end
+      
+      describe "changing path" do
+        it "writes to the new directory" do
+          Eraser::Piece.new('foo.jpg', 0b0101, 'node1').overwrite 'data'
+          File.should exist('node1/foo.jpg.0101')
+          File.read('node1/foo.jpg.0101').should == 'data'
+        end
+      end
     end
   end
 end
