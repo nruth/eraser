@@ -13,7 +13,7 @@ module Eraser
       fundamental_pieces = Chopper.new(file).split_file_into_n_pieces(n_pieces)
       code = Eraser::Code.new
       codes_to_pack = (code.basis_vectors - Code.fundamental_bitmasks(4)).uniq
-      codes_to_pack.each do |bitmask|
+      codes_to_pack.map do |bitmask|
         encode_pieces_with_bitmask(fundamental_pieces, bitmask)
       end
     end

@@ -7,6 +7,10 @@ module Eraser
       self.bitmask = bitmask
     end
 
+    def to_s
+      filename
+    end
+
     def filename
       File.bitmask_appended_filename(original_filename, bitmask)
     end
@@ -22,7 +26,8 @@ module Eraser
     def self.content_xor_to_new_file(pieces)
       filename = pieces.first.original_filename
       new_piece = Piece.new filename, bitmask_xor(pieces)
-      puts "working on #{new_piece.filename}"
+      new_piece.reset_content!
+      puts "xoring #{pieces.join(',')} into #{new_piece.filename}"
       io_streams = pieces.map(&:open_file)
       data = io_streams.map(&:bytes).map(&:to_a)
       data = data.pop.zip(*data).map {|m| m.reduce(:'^')}
@@ -47,6 +52,12 @@ module Eraser
 
     def content
       ::File.open(filename,"rb") {|io| io.read}
+    end
+    
+    def reset_content!
+      ::File.open(filename, 'w') do
+        #truncate file
+      end
     end
   end
 end
