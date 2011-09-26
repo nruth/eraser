@@ -4,43 +4,20 @@ require 'eraser'
 require 'fileutils'
 require 'digest'
 
-num_pieces = 4
-
-#encode
-service = Eraser::Service.new
 filepath = File.join(File.dirname(__FILE__), *%w[media test.jpg])
-service.put filepath
+10.times do |n| #for different combinations of failures
+  puts "Starting Run #{n}\n==========\n"
+  service = Eraser::Service.new
+  service.put filepath
+  (1..3).to_a.choice.times do #for different numbers of failures
+    service.live_nodes.choice.fail!
+  end
 
-# reassembled = Eraser::Decoder.reassemble_original_file(File.basename(filepath), num_pieces)
-# File.open(File.basename(filepath), 'w') {|f| f.print reassembled}
+  service.repair if rand(2) == 0
 
-service.read File.basename(filepath)
-
-#use nodes 1 and 2 to rebuild something on node 4
-# #pick a file to delete & store a hash of its contents
-# removed_filename = 'test.jpg.0001' 
-# original_hash = Digest::SHA1.hexdigest(File.read(removed_filename))
-# 
-# #delete it and remove from available pieces
-# `rm #{removed_filename}`
-# available_pieces = pieces.reject {|p| p.bitmask == 0b0001}
-# raise "fail" if available_pieces == pieces
-# 
-# pieces_to_decode_with = Eraser::Code.basis_vectors_for_node(1) 
-# pieces_to_decode_with += Eraser::Code.basis_vectors_for_node(2)
-# pieces_to_decode_with = pieces_to_decode_with.map {|code| Eraser::Piece.new(input_file.name, code)}
-# 
-# decoder = Eraser::Decoder.new(pieces_to_decode_with)
-# wanted_piece = Eraser::Piece.new(input_file.name, 0b0001)
-# 
-# # Decode and check contents are as they were before deleting
-# decoder.decode_to_files [wanted_piece]
-# 
-# reassembled = Eraser::Decoder.reassemble_original_file(input_file.name, num_pieces)
-# File.open(input_file.name, 'w') {|f| f.print reassembled}
-# 
-# reassembled_hash = Digest::SHA1.hexdigest(reassembled)
-# original_hash = Digest::SHA1.hexdigest(File.read(input_file.path))
-# puts reassembled_hash
-# puts original_hash
-# puts original_hash == reassembled_hash ? "SUCCESS" : "FAILURE"
+  reassembled_data = service.read('test.jpg')
+  reassembled_hash = Digest::SHA1.hexdigest(reassembled_data)
+  original_hash = Digest::SHA1.hexdigest(File.read(filepath))
+  puts (reassembled_hash == original_hash ? "SUCCESS" : "FAILURE") + ' reading consistent reassembled file'
+  puts "\n\n"
+end
