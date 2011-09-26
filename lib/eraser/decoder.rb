@@ -8,7 +8,8 @@ module Eraser
       @pieces = pieces
     end
 
-    def decode(wanted_pieces)
+    # decodes wanted pieces & writes to disk
+    def decode_to_files(wanted_pieces)
       solutions = self.solutions(wanted_pieces)
       solutions.map do |solution|
         pieces_selected_by_solution = Code.elements_indexed_by_bitmask(pieces, solution)
@@ -41,7 +42,7 @@ module Eraser
     end
 
     #final assembly from base pieces, doesn't encode/decode anything
-    def self.build_from_pieces(filename, num_pieces)
+    def self.reassemble_original_file(filename, num_pieces)
       binary = ""
       piece_names = Code.fundamental_bitmasks(num_pieces).map{|n| File.bitmask_appended_filename(filename, n)}
       piece_names[0..-2].each {|piece| binary << ::File.read(piece) }
