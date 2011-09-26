@@ -45,26 +45,6 @@ describe Eraser::Decoder do
         end
       end
     end
-
-    describe "elements_indexed_by_bitmask(array, bitmask)" do
-      let(:array) {[:a, :b, :c, :d]}
-      it "pulls out single elements" do
-        Eraser::Decoder.elements_indexed_by_bitmask(array, 0b1000).should == [:a]
-        Eraser::Decoder.elements_indexed_by_bitmask(array, 0b0100).should == [:b]
-        Eraser::Decoder.elements_indexed_by_bitmask(array, 0b0010).should == [:c]
-        Eraser::Decoder.elements_indexed_by_bitmask(array, 0b0001).should == [:d]
-      end
-
-      it "pulls out all elements with 1111" do
-        Eraser::Decoder.elements_indexed_by_bitmask(array, 0b1111).should == [:a, :b, :c, :d]
-      end
-
-      it "pulls out 2 elements with 1100 0110 etc" do
-        Eraser::Decoder.elements_indexed_by_bitmask(array, 0b1001).should == [:a, :d]
-        Eraser::Decoder.elements_indexed_by_bitmask(array, 0b1010).should == [:a, :c]
-        Eraser::Decoder.elements_indexed_by_bitmask(array, 0b0110).should == [:b, :c]
-      end
-    end
   end
 
   describe "Decoding" do

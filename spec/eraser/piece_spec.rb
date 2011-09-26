@@ -1,5 +1,25 @@
 require File.join(File.dirname(__FILE__), *%w[.. .. eraser])
 describe Eraser::Piece do
+  describe "Piece.content_xor_to_new_file([o1, o2, o3])" do
+    subject {
+      o1 = mock(:content => 0b0011, :bitmask => 0b1000, :original_filename => 'fool.jpg')
+      o2 = mock(:content => 0b0111, :bitmask => 0b0100, :original_filename => 'fool.jpg')
+      o3 = mock(:content => 0b0001, :bitmask => 0b0010, :original_filename => 'fool.jpg')
+      pieces = [o1, o2, o3]
+      result = Eraser::Piece.content_xor_to_new_file(pieces)
+    }
+    its(:original_filename) {should == 'fool.jpg'}
+    its(:bitmask) {should == 0b1110}
+    its(:content) {should == 0b0101.to_s}
+  end
+  
+  specify "Piece.bitmask_xor(pieces)" do
+    o1 = mock(:bitmask => 0b1101)
+    o2 = mock(:bitmask => 0b0001) 
+    o3 = mock(:bitmask => 0b0001)
+    Eraser::Piece.bitmask_xor([o1, o2, o3]).should == 0b1101
+  end
+
   context "with filename 'sonata.mp3', bitmask 0100" do
     let(:filename) {'sonata.mp3'}
     let(:bitmask) { 0b0100 }
