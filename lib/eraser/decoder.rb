@@ -8,7 +8,7 @@ module Eraser
     end
 
     #wanted_pieces - pieces to find, e.g. [0b1000, 0b0100, 0b0010, 0b0001]
-    def decode_pieces(wanted_pieces)
+    def solutions(wanted_pieces)
       solutions = []
       Decoder.all_possible_combinations.each do |combination|
         wanted_pieces.delete_if do |wanted_piece|

@@ -2,14 +2,14 @@ require File.join(File.dirname(__FILE__), *%w[.. .. eraser])
 
 describe Eraser::Decoder do
   describe "Combinatorial Logic" do
-    describe "decode_pieces(wanted_pieces)" do
+    describe "solution(wanted_pieces)" do
       let(:pieces) {[0b1000, 0b0110, 0b0011, 0b0100]}
       subject {Eraser::Decoder.new(pieces)}
       it "returns a combination for the requested piece code" do
-        subject.decode_pieces([0b0100]).should == [0b0001]
-        subject.decode_pieces([0b0010]).should == [0b0101]
-        subject.decode_pieces([0b0001]).should == [0b0111]
-        subject.decode_pieces([0b1000]).should == [0b1000]
+        subject.solution([0b0100]).should == [0b0001]
+        subject.solution([0b0010]).should == [0b0101]
+        subject.solution([0b0001]).should == [0b0111]
+        subject.solution([0b1000]).should == [0b1000]
       end
     end
 
