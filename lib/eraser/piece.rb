@@ -2,9 +2,10 @@ module Eraser
   class Piece
     attr_accessor :original_filename
     attr_accessor :bitmask
-    def initialize(original_filename, bitmask)
+    def initialize(original_filename, bitmask, storage_path=nil)
       self.original_filename = ::File.basename(original_filename)
       self.bitmask = bitmask
+      @storage_path = storage_path
     end
 
     def to_s
@@ -12,7 +13,8 @@ module Eraser
     end
 
     def filename
-      File.bitmask_appended_filename(original_filename, bitmask)
+      filename = File.bitmask_appended_filename(original_filename, bitmask)
+      @storage_path ? ::File.join(@storage_path, filename) : filename
     end
 
     def ^(piece)
@@ -42,11 +44,13 @@ module Eraser
     end
 
     def overwrite(content)
+      FileUtils.mkpath(@storage_path) if @storage_path && !::File.exist?(@storage_path)
       ::File.open(filename, 'wb') {|f| f.print content}
       self
     end
 
     def append(content)
+      FileUtils.mkpath(@storage_path) if @storage_path && !::File.exist?(@storage_path)
       ::File.open(filename, 'ab') {|f| f.print content}
       self
     end
@@ -56,9 +60,14 @@ module Eraser
     end
     
     def reset_content!
+      FileUtils.mkpath(@storage_path) if @storage_path && !::File.exist?(@storage_path)
       ::File.open(filename, 'w') do
         #truncate file
       end
+    end
+    
+    def destroy
+      ::File.delete(filename) if ::File.exists?(filename)
     end
   end
 end
