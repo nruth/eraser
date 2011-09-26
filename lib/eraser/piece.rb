@@ -18,24 +18,23 @@ module Eraser
     end
 
     def ^(piece)
-      bitmask ^ piece.bitmask
+      bitmask | piece.bitmask
     end
 
-    # pieces = [Eraser::Piece] array to xor
+    # pieces = [Eraser::Piece] array to or
     def self.bitmask_xor(pieces)
-      pieces.map(&:bitmask).reduce(:'^')
+      codes = pieces.map(&:bitmask).reduce(:'^')
     end
 
     def self.content_xor_to_new_file(pieces)
       filename = pieces.first.original_filename
-      new_piece = Piece.new filename, bitmask_xor(pieces)
+      new_bitmask = bitmask_xor(pieces)
+      new_piece = Piece.new filename, new_bitmask
       new_piece.reset_content!
-      puts "xoring #{pieces.join(',')} into #{new_piece.filename}"
       io_streams = pieces.map(&:open_file)
       data = io_streams.map(&:bytes).map(&:to_a)
       data = data.pop.zip(*data).map {|m| m.reduce(:'^')}
       new_piece.append data.pack('c*')
-      puts "finished #{new_piece.filename}"
       new_piece
     end
 

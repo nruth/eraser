@@ -5,6 +5,11 @@ describe Eraser::Piece do
     o2 = mock(:bitmask => 0b0001) 
     o3 = mock(:bitmask => 0b0001)
     Eraser::Piece.bitmask_xor([o1, o2, o3]).should == 0b1101
+
+    o1 = mock(:bitmask => 0b0001)
+    o2 = mock(:bitmask => 0b0100) 
+    o3 = mock(:bitmask => 0b1000)
+    Eraser::Piece.bitmask_xor([o1, o2, o3]).should == 0b1101
   end
 
   context "with filename 'sonata.mp3', bitmask 0100" do
