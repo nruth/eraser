@@ -11,10 +11,10 @@ service = Eraser::Service.new
 filepath = File.join(File.dirname(__FILE__), *%w[media test.jpg])
 service.put filepath
 
-# reassembled = Eraser::Decoder.build_from_pieces(File.basename(filepath), num_pieces)
+# reassembled = Eraser::Decoder.reassemble_original_file(File.basename(filepath), num_pieces)
 # File.open(File.basename(filepath), 'w') {|f| f.print reassembled}
 
-# service.read File.basename(filepath)
+service.read File.basename(filepath)
 
 #use nodes 1 and 2 to rebuild something on node 4
 # #pick a file to delete & store a hash of its contents
@@ -34,9 +34,9 @@ service.put filepath
 # wanted_piece = Eraser::Piece.new(input_file.name, 0b0001)
 # 
 # # Decode and check contents are as they were before deleting
-# decoder.decode [wanted_piece]
+# decoder.decode_to_files [wanted_piece]
 # 
-# reassembled = Eraser::Decoder.build_from_pieces(input_file.name, num_pieces)
+# reassembled = Eraser::Decoder.reassemble_original_file(input_file.name, num_pieces)
 # File.open(input_file.name, 'w') {|f| f.print reassembled}
 # 
 # reassembled_hash = Digest::SHA1.hexdigest(reassembled)

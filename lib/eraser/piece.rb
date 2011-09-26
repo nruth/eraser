@@ -1,3 +1,5 @@
+require 'fileutils'
+
 module Eraser
   class Piece
     attr_accessor :original_filename
@@ -27,15 +29,19 @@ module Eraser
     end
 
     def self.content_xor_to_new_file(pieces)
-      filename = pieces.first.original_filename
-      new_bitmask = bitmask_xor(pieces)
-      new_piece = Piece.new filename, new_bitmask
-      new_piece.reset_content!
-      io_streams = pieces.map(&:open_file)
-      data = io_streams.map(&:bytes).map(&:to_a)
-      data = data.pop.zip(*data).map {|m| m.reduce(:'^')}
-      new_piece.append data.pack('c*')
-      new_piece
+      if pieces.length == 1
+        pieces.first
+      else
+        filename = pieces.first.original_filename
+        new_bitmask = bitmask_xor(pieces)
+        new_piece = Piece.new filename, new_bitmask
+        new_piece.reset_content!
+        io_streams = pieces.map(&:open_file)
+        data = io_streams.map(&:bytes).map(&:to_a)
+        data = data.pop.zip(*data).map {|m| m.reduce(:'^')}
+        new_piece.append data.pack('c*')
+        new_piece
+      end
     end
 
     def open_file
@@ -43,13 +49,13 @@ module Eraser
     end
 
     def overwrite(content)
-      FileUtils.mkpath(@storage_path) if @storage_path && !::File.exist?(@storage_path)
+      ::FileUtils.mkpath(@storage_path) if @storage_path && !::File.exist?(@storage_path)
       ::File.open(filename, 'wb') {|f| f.print content}
       self
     end
 
     def append(content)
-      FileUtils.mkpath(@storage_path) if @storage_path && !::File.exist?(@storage_path)
+      ::FileUtils.mkpath(@storage_path) if @storage_path && !::File.exist?(@storage_path)
       ::File.open(filename, 'ab') {|f| f.print content}
       self
     end
@@ -59,7 +65,7 @@ module Eraser
     end
     
     def reset_content!
-      FileUtils.mkpath(@storage_path) if @storage_path && !::File.exist?(@storage_path)
+      ::FileUtils.mkpath(@storage_path) if @storage_path && !::File.exist?(@storage_path)
       ::File.open(filename, 'w') do
         #truncate file
       end

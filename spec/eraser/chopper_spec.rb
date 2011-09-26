@@ -93,7 +93,7 @@ describe Eraser::Chopper do
 
     specify "reassembling the output files gives the same content as the original file" do
       require 'digest/sha1'
-      reassembled = Eraser::Decoder.build_from_pieces(@file.name, num_pieces)
+      reassembled = Eraser::Decoder.reassemble_original_file(@file.name, num_pieces)
       Digest::SHA1.hexdigest(reassembled).should == Digest::SHA1.hexdigest(File.read(sample_file_path))
     end
   end
