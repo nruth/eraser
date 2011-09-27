@@ -18,7 +18,7 @@ module Eraser
     def distribute_pieces(pieces)
       @nodes = Node.spawn_nodes(5)
       @nodes.each do |node|
-        bitmasks = Eraser::Code.basis_vectors_for_node(node.id)
+        bitmasks = Eraser::Code.basis_vectors_for_node(node.node_id)
         nodes_pieces = pieces.select do |p|
           bitmasks.include?(p.bitmask)
         end

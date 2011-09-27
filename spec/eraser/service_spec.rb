@@ -36,7 +36,7 @@ describe Eraser::Service do
 
   describe "distribute_pieces(pieces)" do
 
-    let(:node) {mock}
+    let(:node) {mock(:node_id => 1)}
     let(:nodes) {[node]}
     let(:bitmask) {0b0010}
     let(:piece) {mock(:bitmask => bitmask)}
@@ -55,7 +55,7 @@ describe Eraser::Service do
 
     it "sends the basis vector decided pieces to each node" do
       node_id = mock
-      node.should_receive(:id).and_return node_id
+      node.should_receive(:node_id).and_return node_id
       Eraser::Code.should_receive(:basis_vectors_for_node).with(node_id).and_return [bitmask]
       node.should_receive(:copy_pieces).with([piece])
       service.distribute_pieces(pieces)

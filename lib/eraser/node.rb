@@ -1,9 +1,9 @@
 module Eraser
   class Node
-    attr_reader :id
+    attr_reader :node_id
     attr_reader :root_path
-    def initialize(id)
-      @id = id
+    def initialize(node_id)
+      @node_id = node_id
       @pieces = []
     end
 
@@ -22,7 +22,7 @@ module Eraser
     end
 
     def storage_path
-      "#{id}"
+      "#{node_id}"
     end
 
     def pieces(filename=nil)
@@ -36,11 +36,11 @@ module Eraser
     def fail!
       require 'fileutils'
       FileUtils.rm_rf storage_path
-      puts "Node #{id}: BANG"
+      puts "Node #{node_id}: BANG"
     end
     
     def to_s
-      "Node #{id}"
+      "Node #{node_id}"
     end
   
   private
