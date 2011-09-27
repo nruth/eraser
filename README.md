@@ -1,6 +1,14 @@
+Running the demo
+================
+
+0. (sudo) gem install bundler
+1. (sudo) bundle install
+2. gcc -o xor xor.c
+3. copy a binary file to media/test.mp3
+4. ./demo.rb or explore for yourself
+
 Running tests
 =============
 
-1. install rspec 2 (gem install rspec)
-2. copy a binary file to media/test.mp3
-3. run `rspec spec`
+1. bundle install --with=development
+2. run `rspec spec`
