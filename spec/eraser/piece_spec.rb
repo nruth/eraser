@@ -40,16 +40,21 @@ describe Eraser::Piece do
       end
 
       describe "Piece.content_xor_to_new_file([o1, o2, o3])" do
-        subject {
-          o1 = mock(:content => 0b0011, :bitmask => 0b1000, :original_filename => 'fool.jpg')
-          o2 = mock(:content => 0b0111, :bitmask => 0b0100, :original_filename => 'fool.jpg')
-          o3 = mock(:content => 0b0001, :bitmask => 0b0010, :original_filename => 'fool.jpg')
-          pieces = [o1, o2, o3]
-          result = Eraser::Piece.content_xor_to_new_file(pieces)
-        }
-        its(:original_filename) {should == 'fool.jpg'}
-        its(:bitmask) {should == 0b1110}
-        its(:content) {should == 0b0101.to_s}
+        let(:p1) {Eraser::Piece.new('test.foo', 0b1000).tap{|p|p.overwrite(0b0011)}}
+        let(:p2) {Eraser::Piece.new('test.foo', 0b0100).tap{|p|p.overwrite(0b0111)}}
+        describe "2 pieces" do
+          it "makes a new piece with the xor'd contents" do
+            new_piece = Eraser::Piece.content_xor_to_new_file([p1, p2])
+            new_piece.original_filename.should == p1.original_filename
+            new_piece.bitmask.should == p1.bitmask ^ p2.bitmask
+            new_piece.content.should == [0b0011 ^ 0b0111].pack('c*')
+          end
+        end
+        describe "1 piece" do
+          it "returns the same piece" do
+            Eraser::Piece.content_xor_to_new_file([p1]).should == p1
+          end
+        end
       end
 
       describe "overwrite(content)" do

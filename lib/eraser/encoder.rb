@@ -11,17 +11,20 @@ module Eraser
     # writing the recombined (by erasure code) files to disk
     def encode
       fundamental_pieces = Chopper.new(file).split_file_into_n_pieces(n_pieces)
-      codes_to_pack = (Eraser::Code.basis_vectors - Eraser::Code.fundamental_bitmasks(4))
-      packed_pieces = codes_to_pack.map do |bitmask|
-        encode_pieces_with_bitmask(fundamental_pieces, bitmask)
-      end
-      all_encoded_pieces = fundamental_pieces + packed_pieces
+      encoded_pieces = encode_pieces(fundamental_pieces)
+      all_encoded_pieces = fundamental_pieces + encoded_pieces
     end
 
     def encode_pieces_with_bitmask(pieces, bitmask)
-      raise "must have 4 pieces" unless pieces.length == 4
+      raise "must have #{n_pieces} pieces" unless pieces.length == n_pieces
       pieces_indexed = Code.elements_indexed_by_bitmask(pieces, bitmask)
       Piece.content_xor_to_new_file pieces_indexed
+    end
+
+    def encode_pieces(fundamental_pieces)
+      encoded_pieces = (Eraser::Code.basis_vectors - Eraser::Code.fundamental_bitmasks(n_pieces)).map do |bitmask|
+        encode_pieces_with_bitmask(fundamental_pieces, bitmask)
+      end
     end
   end
 end
