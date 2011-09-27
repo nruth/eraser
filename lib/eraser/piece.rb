@@ -90,12 +90,8 @@ module Eraser
         filename = pieces.first.original_filename
         new_bitmask = bitmask_xor(pieces)
         new_piece = Piece.new filename, new_bitmask
-        # new_piece.reset_content!
-        # io_streams = pieces.map(&:open_file)
-        # data = io_streams.map(&:bytes).map(&:to_a)
-        # data = data.pop.zip(*data).map {|m| m.reduce(:'^')}
-        # new_piece.append data.pack('c*')
-        puts command = "./xor #{new_piece.filename} #{pieces.map(&:filename).join(' ')}"
+        xor_path = ::File.expand_path(::File.join(::File.dirname(__FILE__), *%w[.. .. xor]))
+        command = "#{xor_path} #{new_piece.filename} #{pieces.map(&:filename).join(' ')}"
         `#{command}`
         new_piece
       end
