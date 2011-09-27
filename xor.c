@@ -1,31 +1,20 @@
-#include <stdio.h>
 #include <stdlib.h>
+#include <stdio.h> 
 
 int xor_files(FILE *files[], int number_of_files, char *outputfilename) {
-  int i;
-  int *tmp = (int *) malloc(number_of_files * sizeof (FILE));
-
-  // init tmp
-  for (i = 0; i < number_of_files; i++) tmp[i] = 0;
+  int file_index;
+  int x = 0;
 
   FILE* output;  
   output = fopen(outputfilename, "wb");
 
   // read a byte from each file and store them in tmp
-  while ((tmp[0] = fgetc(files[0])) != EOF) {
-    for (i = 1; i < number_of_files; i++) {
-      tmp[i] = fgetc(files[i]);
+  while ((x = fgetc(files[0])) != EOF) {
+    for (file_index = 1; file_index < number_of_files; file_index++) {
+      x = x ^ fgetc(files[file_index]);
     }
 
-    // xor
-    int j; 
-    int xor_result = 0;
-    for (j = 0; j < number_of_files-1; j++) {
-      xor_result = tmp[j] ^ tmp[j+1];
-    }
-    
-    // then write to new file
-    fputc(xor_result, output);
+    fputc(x, output);
   }
 
   fclose(output);
@@ -39,18 +28,21 @@ int xor_files(FILE *files[], int number_of_files, char *outputfilename) {
  */
 int main(int args, char** argv) 
 {
-  FILE *files[args-2];
+  int number_of_files = args-2;
+  FILE *files[number_of_files];
   int i; 
 
-  for (i = 0; i < args-2; i++) {
-    files[i] = fopen(argv[i+2], "r");
+  for (i = 0; i < number_of_files; i++) {
+    files[i] = fopen(argv[i+2], "rb");
   }
   
-  xor_files(files, args-2, argv[1]);
+  xor_files(files, number_of_files, argv[1]);
 
-  for (i = 0; i < args-2; i++) {
+  for (i = 0; i < number_of_files; i++) {
     fclose(files[i]);
   }
   
   return 0;
 }
+
+
