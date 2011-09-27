@@ -49,10 +49,16 @@ module Eraser
     end
 
     def pieces_to_decode_with(filename)
-      retrieval_nodes = live_nodes[0..1]
+      live_nodes = self.live_nodes
+      retrieval_nodes = if live_nodes.length > 2
+        [live_nodes[0], live_nodes[1], live_nodes[2]]
+      elsif live_nodes.length == 2
+        [live_nodes[0], live_nodes[1]]
+      else
+        raise "too few nodes alive: #{live_nodes.length}"
+      end
       puts "Using nodes #{retrieval_nodes.join(', ')} for data retrieval"
       pieces = retrieval_nodes.map {|node| download_pieces(node, filename)}
-      pieces.flatten
     end
 
     def decode_to_files(wanted_pieces, pieces_to_decode_with)
