@@ -21,14 +21,18 @@ describe Eraser::Decoder do
     end
 
     describe "decode_to_files(wanted_pieces)" do
-      it "finds working solutions and builds the files with them" do
-        wanted_pieces = mock
-        wanted_pieces.should_receive(:map).and_return wanted_pieces_bitmasks = mock
-        solution = mock
-        subject.should_receive(:solutions).with(wanted_pieces_bitmasks).and_return [solution]
-        Eraser::Code.should_receive(:elements_indexed_by_bitmask).with(two_node_pieces, solution).and_return pieces_selected_by_solution = mock
-        Eraser::Piece.should_receive(:content_xor_to_new_file).with(pieces_selected_by_solution)
-        subject.decode_to_files(wanted_pieces)
+      describe "finding 3 group or 2 group solutions" do
+        it "goes with the 3 group solution if it finds one" do
+          subject.should_receive(:solve_with_three_groups).and_return []
+          subject.should_not_receive(:solve_with_two_groups)
+          subject.decode_to_files([])
+        end
+
+        it "goes with the 2 group solution if no 3 group solution found" do
+          subject.should_receive(:solve_with_three_groups).and_return false
+          subject.should_receive(:solve_with_two_groups).and_return []
+          subject.decode_to_files([])
+        end
       end
     end
   end
@@ -68,7 +72,7 @@ describe Eraser::Decoder do
     end
 
     describe "all_possible_combinations for 4 items" do
-      subject {Eraser::Decoder.all_possible_combinations}
+      subject {Eraser::Decoder.all_possible_combinations(4)}
       its(:length) {should eq(15) }
       it "should contain all 4 bit binary combinations" do
         subject.should == [ 
