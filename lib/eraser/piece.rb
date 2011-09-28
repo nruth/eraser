@@ -54,7 +54,7 @@ module Eraser
         FILE* output = fopen(result_path, "wb");
         while ((byte = fgetc(input_files[0])) != EOF) {
           for (counter = 1; counter < input_files_length; counter++) { 
-            byte = byte ^ fgetc(input_files[counter]);
+            byte ^= fgetc(input_files[counter]);
           }
           fputc(byte, output);
         }
