@@ -89,10 +89,16 @@ module Eraser
     def self.reassemble_original_file(filename, num_pieces)
       binary = ""
       piece_names = Code.fundamental_bitmasks(num_pieces).map{|n| File.bitmask_appended_filename(filename, n)}
-      piece_names[0..-2].each {|piece| binary << ::File.read(piece) }
+      piece_names[0..-2].each do |piece| 
+        ::File.open(piece, 'rb') do |piece_file|
+          binary << piece_file.read
+        end
+      end
 
       last_piece = piece_names.last
-      binary << ::File.read(last_piece, ::File.stat(last_piece).size - Eraser::Padding.read_padding_bytes(filename))
+      ::File.open(last_piece, 'rb') do |last_piece_file|
+        binary << last_piece_file.read(::File.stat(last_piece).size - Eraser::Padding.read_padding_bytes(filename))
+      end
       binary
     end
 
