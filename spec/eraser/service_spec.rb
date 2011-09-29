@@ -96,8 +96,8 @@ describe Eraser::Service do
         5.times do #for different combinations of failures
           service = Eraser::Service.new
           service.put filepath
-          (1..3).to_a.choice.times do #for different numbers of failures
-            service.live_nodes.choice.fail!
+          rand(4).times do #for different numbers of failures
+            service.live_nodes.sample.fail!
           end
 
           reassembled_data = service.read('test.jpg')

@@ -9,9 +9,9 @@ filepath = File.join(File.dirname(__FILE__), *%w[media test.mp3])
   puts "Starting Run #{n}\n==========\n"
   service = Eraser::Service.new
   service.put filepath
-  (1..3).to_a.choice.times do #for different numbers of failures
-     service.live_nodes.choice.fail!
-   end
+
+  # 0 - 3 node failures
+  rand(4).times { service.live_nodes.sample.fail! }
 
   service.repair if rand(2) == 0
 
