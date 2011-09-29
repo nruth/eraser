@@ -17,3 +17,4 @@ DISCLAIMER
 ==========
 
 This probably doesn't run on Windows.
+Tested on Ruby 1.9.2 and 1.8.7
