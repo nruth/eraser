@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 
-require 'eraser'
+Dir[File.expand_path(File.join(File.dirname(__FILE__),'eraser.rb'))].each {|f| require f}
 require 'fileutils'
 require 'digest'
 
