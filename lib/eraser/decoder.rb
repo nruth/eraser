@@ -1,6 +1,8 @@
 module Eraser
   class Decoder
-    attr_reader :piece_groups
+    def piece_groups
+      @piece_groups.dup
+    end
 
     #piece_groups - groups of available pieces (Eraser::Piece)
     # - e.g. [[o1,o1o2], [o3o4,o3]]
@@ -11,12 +13,29 @@ module Eraser
       @piece_groups = piece_groups
     end
 
+    # decodes wanted pieces & writes to disk
+    def decode_to_files(wanted_pieces)
+      solution = solve_with_three_groups(wanted_pieces) || solve_with_two_groups(wanted_pieces)
+      solution.map {|pieces| Piece.content_xor_to_new_file(pieces)}
+    end
+
     def solve_with_three_groups(wanted_pieces)
-      # Decoder.all_possible_combinations(3).each do |current_grouping|
-      #   pieces = current_grouping.flatten
-      #   solutions = self.solutions(wanted_pieces.map(&:bitmask))
-      #   pieces = solutions.map {|mask| Code.elements_indexed_by_bitmask(pieces, mask)}
-      # end
+      if piece_groups.length < 3
+        puts "too few nodes for 3-node assembly"
+        return false
+      end
+      wanted_masks = wanted_pieces.map(&:bitmask)
+      piece_groups.permutation(3).each do |current_nodes|
+        n = current_nodes.dup; n.shift.product(*n).each do |pieces|
+          piece_masks = pieces.map(&:bitmask)
+          solutions = self.solutions_from_three(wanted_masks, piece_masks)
+          if solutions.values.length == wanted_pieces.length
+            solvant = solutions.keys.map {|wanted| Code.elements_indexed_by_bitmask(pieces, solutions[wanted].first)}
+            puts "Solved with 3 nodes, #{solvant.length} pieces: #{solvant.map{|p| "[#{p.join(', ')}]"}} (solutions #{printf_bitmasks_hash(solutions)})"
+            return solvant
+          end
+        end
+      end
       false
     end
 
@@ -24,12 +43,8 @@ module Eraser
       pieces = (piece_groups.first + piece_groups.last).flatten
       solutions = self.solutions(wanted_pieces.map(&:bitmask), pieces.map(&:bitmask))
       pieces = solutions.map {|mask| Code.elements_indexed_by_bitmask(pieces, mask)}
-    end
-
-    # decodes wanted pieces & writes to disk
-    def decode_to_files(wanted_pieces)
-      solution = solve_with_three_groups(wanted_pieces) || solve_with_two_groups(wanted_pieces)
-      solution.map {|pieces| Piece.content_xor_to_new_file(pieces)}
+      puts "Solved with 2 nodes, #{pieces.length} combinations: #{pieces.map{|p| "[#{p.join(', ')}]"}}"
+      pieces
     end
 
     #wanted_pieces - pieces to find, e.g. [0b1000, 0b0100, 0b0010, 0b0001]
@@ -41,6 +56,20 @@ module Eraser
         wanted_pieces_masks.delete_if do |wanted_piece_mask|
           if combination_xors_to?(combination_bitmask, wanted_piece_mask, available_piece_masks)
             solutions << combination_bitmask
+            true
+          end
+        end
+      end
+      solutions
+    end
+
+    def solutions_from_three(wanted_pieces_masks, available_piece_masks)
+      solutions = Hash.new([])
+      Decoder.all_possible_combinations(3).each do |combination_bitmask|
+        mutable_wanted_pieces_masks = wanted_pieces_masks.dup
+        mutable_wanted_pieces_masks.delete_if do |wanted_piece_mask|
+          if combination_xors_to?(combination_bitmask, wanted_piece_mask, available_piece_masks)
+            solutions[wanted_piece_mask] = solutions[wanted_piece_mask] + [combination_bitmask]
             true
           end
         end
@@ -71,6 +100,18 @@ module Eraser
     def self.all_possible_combinations(elements)
       x = (2**elements) - 1
       (1..x).to_a
+    end
+
+    def printf_bitmasks_hash(hsh)
+      hsh.to_a.map {|b|"#{printf_bitmask(b[0])} => #{printf_bitmasks(b[1])}"}.join(', ')
+    end
+
+    def printf_bitmasks(arry)
+      "[#{arry.map {|b|printf_bitmask(b)}.join(', ')}]"
+    end
+
+    def printf_bitmask(bitmask)
+      format('%04b',bitmask)
     end
   end
 end
