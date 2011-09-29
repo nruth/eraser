@@ -21,3 +21,9 @@ If you can't get the inline C code in lib/piece.rb to compile, e.g. missing head
 backticks-xor branch, and use the standalone xor program.
 
 Compile the standalone xor.c with: gcc -o xor xor.c
+
+
+DISCLAIMER
+==========
+
+This probably doesn't run on Windows.
