@@ -1,18 +1,28 @@
 module Eraser
   class Service
+    # retrieve the data contents of the file submitted as filename
+    def get(filename)
+      original_pieces = Eraser::Code.fundamental_bitmasks(num_pieces).map do |code| 
+        Eraser::Piece.new(filename, code)
+      end
+      decode_to_files(original_pieces, pieces_to_decode_with(filename))
+      Eraser::Decoder.reassemble_original_file(filename, num_pieces)
+    end
+
+    # encode and store the file found at filepath
+    def put(filepath)
+      input_file = Eraser::File.new ::File.expand_path(filepath)
+      encoder = Eraser::Encoder.new(input_file, num_pieces)
+      pieces = encoder.encode
+      distribute_pieces(pieces)
+    end
+
     def num_pieces
       4
     end
 
     def num_nodes
       5
-    end
-
-    def put(file)
-      input_file = Eraser::File.new ::File.expand_path(file)
-      encoder = Eraser::Encoder.new(input_file, num_pieces)
-      pieces = encoder.encode
-      distribute_pieces(pieces)
     end
 
     def distribute_pieces(pieces)
@@ -34,14 +44,6 @@ module Eraser
         new_piece.overwrite(sent_piece.content)
         new_piece
       end
-    end
-
-    def read(filename)
-      original_pieces = Eraser::Code.fundamental_bitmasks(num_pieces).map do |code| 
-        Eraser::Piece.new(filename, code)
-      end
-      decode_to_files(original_pieces, pieces_to_decode_with(filename))
-      Eraser::Decoder.reassemble_original_file(filename, num_pieces)
     end
 
     def live_nodes

@@ -67,7 +67,7 @@ describe Eraser::Service do
     end
   end
 
-  describe "read(filename)" do
+  describe "get(filename)" do
     around(:each) do |example|
       require 'fileutils'
       begin
@@ -85,7 +85,7 @@ describe Eraser::Service do
     it "takes a filename and returns the file contents" do
       service = Eraser::Service.new
       service.put filepath
-      reassembled_data = service.read('test.jpg')
+      reassembled_data = service.get('test.jpg')
       reassembled_hash = Digest::SHA1.hexdigest(reassembled_data)
       original_hash = Digest::SHA1.hexdigest(File.read(filepath))
       reassembled_hash.should == original_hash
@@ -100,7 +100,7 @@ describe Eraser::Service do
             service.live_nodes.sample.fail!
           end
 
-          reassembled_data = service.read('test.jpg')
+          reassembled_data = service.get('test.jpg')
           reassembled_hash = Digest::SHA1.hexdigest(reassembled_data)
           original_hash = Digest::SHA1.hexdigest(File.read(filepath))
           reassembled_hash.should == original_hash

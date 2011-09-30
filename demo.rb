@@ -15,7 +15,7 @@ filepath = File.join(File.dirname(__FILE__), *%w[media test.mp3])
 
   service.repair if rand(2) == 0
 
-  reassembled_data = service.read(File.basename(filepath))
+  reassembled_data = service.get(File.basename(filepath))
   reassembled_hash = Digest::SHA1.hexdigest(reassembled_data)
   original_hash = Digest::SHA1.hexdigest(File.read(filepath))
   raise("FAILURE reading consistent reassembled file") unless reassembled_hash == original_hash 
